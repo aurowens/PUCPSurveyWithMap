@@ -1,0 +1,17 @@
+{
+    "contents" : "\n# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\nlibrary(shinyjs)\nlibrary(googlesheets)\nlibrary(ggmap)\n\nshinyServer(function(input, output) {\n  \n  observeEvent(input$give_consent, {\n    shinyjs::show(\"form\")\n    shinyjs::hide(\"consentform\")\n  }) \n  observeEvent(input$no_consent,{\n    shinyjs::show(\"thank_you_no_consent\")\n    shinyjs::hide(\"consentform\")\n  })\n  observe({\n    \n    # check if all mandatory fields have a value\n    mandatoryFilled <-\n      vapply(fieldsMandatory,\n             function(x) {\n               if (class(input[[x]]) == \"Date\"){\n                 !is.null(input[[x]]) \n               }else{\n                 !is.null(input[[x]]) && input[[x]] != \"\"\n               }\n             },\n             logical(1))\n    mandatoryFilled <- all(mandatoryFilled)\n    \n    # enable/disable the submit button\n    shinyjs::toggleState(id = \"submit\", condition = mandatoryFilled)\n  })\n  formData <- reactive({\n    data <- sapply(fieldsAll, function(x) input[[x]])\n    lon = geocode_latlon(input$location)$lon\n    lat = geocode_latlon(input$location)$lat\n    data <- c(data, timestamp = epochTime(), lon = lon, lat= lat)\n    data <- t(data)\n    data\n  })\n  saveData <- function(data) {\n    # Grab the Google Sheet\n    sheet <- gs_title(table)\n    # Add the data as a new row\n    gs_add_row(sheet, input = data)\n  }\n  \n  # action to take when submit button is pressed\n  \n  observeEvent(input$submit, {\n    shinyjs::disable(\"submit\")\n    shinyjs::show(\"submit_msg\")\n    shinyjs::hide(\"error\")\n    \n    tryCatch({\n      saveData(formData())\n      shinyjs::reset(\"form\")\n      shinyjs::hide(\"form\")\n      shinyjs::show(\"thankyou_msg\")\n    },\n    error = function(err) {\n      shinyjs::html(\"error_msg\", err$message)\n      shinyjs::show(id = \"error\", anim = TRUE, animType = \"fade\")\n    },\n    finally = {\n      shinyjs::enable(\"submit\")\n      shinyjs::hide(\"submit_msg\")\n    })\n  })\n  output$responsesTable <- DT::renderDataTable(\n    loadData(),\n    rownames = FALSE,\n    options = list(searching = FALSE, lengthChange = FALSE)\n  ) \n  \n  observeEvent(input$viewlocal, {\n    output$mymap <- renderLeaflet({\n      lc <- geocode_latlon(input$location)\n      leaflet() %>%\n        addTiles() %>%  # Add default OpenStreetMap map tiles\n        addMarkers(lng=lc$lon, lat=lc$lat, popup=as.character(input$location))\n    })\n  })\n  \n  observeEvent(input$submit_another, {\n    shinyjs::show(\"form\")\n    shinyjs::hide(\"thankyou_msg\")\n  }) \n})\n",
+    "created" : 1470156224557.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "7053686",
+    "id" : "786F54FD",
+    "lastKnownWriteTime" : 1470240717,
+    "path" : "~/Desktop/Coyote Research/PUCPSurveryWithMap/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

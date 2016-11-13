@@ -1,0 +1,18 @@
+{
+    "contents" : "fieldsMandatory <- c(\"Date\", \"time\", \"number_of_coyotes\", \"location\")\n\ntoday <- as.Date(Sys.Date())\nlabelMandatory <- function(label) {\n  tagList(\n    label,\n    span(\"*\", class = \"mandatory_star\")\n  )\n}\nappCSS <-\n  \".mandatory_star { color: red; }\n#error { color: red; }\"\n\nfieldsAll <- c(\"location\",\"Date\",\"time\",\"number_of_coyotes\",\"recurrent\", \"notes\",\"zipcode\", \"hear_about_us\",\"other\", \"contact\", \"comments\")\nresponsesDir <- file.path(\"responses\")\nimDir <- file.path(\"www\")\nepochTime <- function() {\n  (Sys.time())\n}\nloadData <- function() {\n  # Grab the Google Sheet\n  sheet <- gs_title(table)\n  # Read the data\n  gs_read_csv(sheet)\n}\n\nhumanTime <- function() format(Sys.time(), \"%Y%m%d-%H%M%OS\")\n\ntable <- \"PUCP Reports\"\n\ngeocode_latlon <- function(x) geocode(x, output = \"latlon\")\n\n\n\n",
+    "created" : 1470156300830.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4146469450",
+    "id" : "CA121FF5",
+    "lastKnownWriteTime" : 1470678499,
+    "path" : "~/Desktop/Coyote Research/PUCPSurveryWithMap/global.R",
+    "project_path" : "global.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
